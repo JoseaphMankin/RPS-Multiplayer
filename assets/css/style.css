@@ -18,7 +18,7 @@ header{
 header > h1{
     color: #24272E;
     text-align: center;
-    font-family: Asap, sans-serif;
+    font-size: 50px;
 }
 
 .score-board{
@@ -62,6 +62,18 @@ header > h1{
     font-weight: bold;
 }
 
+.battleground{
+    color: white;
+    text-align: center;
+    font-size: 80px;
+    margin: 20px auto;
+}
+
+.battlePick{
+    display: inline-block;
+    
+}
+
 .choices{
     text-align: center;
     margin-top: 50px
@@ -69,7 +81,6 @@ header > h1{
 
 .choice{
     display: inline-block;
-
 }
 
 .choice:hover{
