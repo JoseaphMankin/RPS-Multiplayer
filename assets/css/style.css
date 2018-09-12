@@ -46,13 +46,13 @@ header > h1{
 .user-label{
     position: absolute;
     top: 40;
-    left: -90px;
+    left: -100px;
 }
 
 .computer-label{
     position: absolute;
     top: 30;
-    right: -90px;
+    right: -100px;
 }
 
 .result{
@@ -77,7 +77,15 @@ header > h1{
 
 .choices{
     text-align: center;
-    margin-top: 50px
+    margin-top: 50px;
+   
+}
+.stats{
+    font-size: 24px;
+    text-align: left;
+   
+    color: white;
+    padding: 0px 40px;
 }
 
 .choice{
@@ -93,10 +101,65 @@ img{
     width: 150px;
 }
 
+.running{
+    height: 200px;
+    width: 100%;
+    margin-bottom: 4px;
+}
+
 .message{
     text-align: center;
     color: white;
     font-weight: bold;
     font-size: 20px;
     margin-top: 20px;
+}
+
+h3{
+    text-align: center;
+    width: 100%;
+}   
+
+.logIn{
+    position: relative;
+    margin: 20px auto;
+    border: 3px solid white;
+    text-align: center;
+    width: 50%;
+    color: white;
+    font-size: 46px;
+    padding: 15px 20px;
+    border: red solid 3px;
+}
+
+.existingUsers{
+    position: relative;
+    margin: 20px auto;
+    border: 3px solid white;
+    text-align: center;
+    width: 80%;
+    height: fit-content;
+    color: white;
+    font-size: 46px;
+    padding: 15px 20px;
+    border: red solid 3px;
+}
+
+.user-btn{
+    margin: 2px;
+}
+
+.battleUserLeft{
+    position: relative;
+    text-align: right;
+    margin: 0px auto;
+    width: 100%;
+    padding: 0px;
+}
+.battleUserRight{
+    position: relative;
+    text-align: left;
+    margin: 0px auto;
+    width: 100%;
+    padding: 0px;
 }
