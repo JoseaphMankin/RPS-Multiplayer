@@ -21,8 +21,8 @@ $(document).ready(function () {
     let userGuess = "";
     let computerGuess = "";
 
-    let leftPlayer = "";
-    let rightPlayer = "";
+    let leftPlayer = "Compy";
+    let rightPlayer = "Compy";
     let isLeftActive = true;
 
     //Firebase Variables (JOE: These might actually replace some of the above)
@@ -81,7 +81,7 @@ $(document).ready(function () {
             // Get the input values
             leftPlayer = $(this).attr("data-user");
 
-            //comparison to see if this is a New User or an Existing One
+            //MAYBE THIS NEEDS TO NOT BE A LISTENER - SAT CLASS Comparison to see if this is a New User or an Existing One
             database.ref().on("value", function (snapshot) {
 
                 if (leftPlayer == snapshot.val().playerName) {
@@ -240,6 +240,7 @@ $(document).ready(function () {
     database.ref("mainScoreboard").on("value", function (snapshot) {
         $(".userScore").text(userScore);
         $(".computerScore").text(computerScore);
+        console.log(leftPlayer, rightPlayer)
 
         // If Firebase has a player, wins and losses stored (first case)
         //     if (snapshot.child("playerName").exists() && snapshot.child("playerWins").exists()) {
@@ -280,35 +281,7 @@ $(document).ready(function () {
 
     });
 
-    //This is actually being called to run at the end of every game logic round above.
-
-    // function statUpdate() {
-
-    //     // This callback keeps the page updated when a value changes in firebase.
-    //     database.ref().on("value", function (snapshot) {
-
-    //         // Change the value of our clickCounter to match the value in the database
-    //         leftWins = snapshot.val().playerWins;
-
-    //         // Change the HTML using jQuery to reflect the updated clickCounter value
-    //         $("#click-value").text(snapshot.val().clickCount);
-    //         // Alternate solution to the above line
-    //         // $("#click-value").html(clickCounter);
-
-    //         // If any errors are experienced, log them to console.
-    //     }, function (errorObject) {
-    //         console.log("The read failed: " + errorObject.code);
-
-    //         database.ref().set({ playerWins: leftWins });
-    //         let rightWins = localStorage.getItem("rightWins");
-    //         let totalWins = Number(leftWins) + Number(rightWins);
-    //         console.log(totalWins);
-
-    //     });
-    // };
-
-
-    // Boilerplate for Online Presence 
+    // BOILERPLATE FOR ONLINE PRESENCE. 
     // --------------------------------------------------------------
     // connectionsRef references a specific location in our database.
     // All of our connections will be stored in this directory.
