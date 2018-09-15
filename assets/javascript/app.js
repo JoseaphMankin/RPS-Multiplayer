@@ -1,6 +1,5 @@
 $(document).ready(function () {
 
-    // Initialize Firebase
     var config = {
         apiKey: "AIzaSyAmtWU0JuUHWYTWR1MeE2eb0X6zn5vuOvs",
         authDomain: "rps-multiplayer-deab7.firebaseapp.com",
@@ -8,10 +7,10 @@ $(document).ready(function () {
         projectId: "rps-multiplayer-deab7",
         storageBucket: "rps-multiplayer-deab7.appspot.com",
         messagingSenderId: "825187295627"
-    };
-    firebase.initializeApp(config);
+      };
+      firebase.initializeApp(config);
 
-    //initial global varibles
+    //initial global varibles   
     var database = firebase.database();
     let userScore = 0;
     let computerScore = 0;
@@ -23,7 +22,8 @@ $(document).ready(function () {
 
     let leftPlayer = "Compy";
     let rightPlayer = "Compy";
-    let isLeftActive = true;
+    let isLeftActive = false;
+    let isPlayingComputer = true;
 
     //Firebase Variables (JOE: These might actually replace some of the above)
     // let playerData = "";
@@ -44,6 +44,19 @@ $(document).ready(function () {
 
     //Main Game Div screen starts out hidden during login
     $(".main").toggle();
+    $(".logInControls").toggle();
+   
+    $(".playComputer").on("click", function () {
+        isplayingComputer = true;
+        $(".logInControls").toggle();
+        $(".computerAsk").toggle();
+    });
+
+    $(".playUser").on("click", function () {
+        isplayingComputer = false;
+        $(".logInControls").toggle();
+        $(".computerAsk").toggle();
+    });
 
     //LOGIN SCREEN----------------------------------------------------
     //Dynamic Creation of User Buttons if they already exist in the "users" Firebase
@@ -82,7 +95,9 @@ $(document).ready(function () {
             leftPlayer = $(this).attr("data-user");
 
             //MAYBE THIS NEEDS TO NOT BE A LISTENER - SAT CLASS Comparison to see if this is a New User or an Existing One
-            database.ref().on("value", function (snapshot) {
+            database.ref().on("child_added", function (snapshot) {
+
+                let sv = snapshot.val();
 
                 if (leftPlayer == snapshot.val().playerName) {
                     leftPlayer = snapshot.val().playerName;
@@ -108,6 +123,7 @@ $(document).ready(function () {
 
                 //Hide the Login Screen and Load the Game Page
                 $(".logIn").hide();
+                $("#rightHands").hide();
                 $(".main").show();
 
             });
@@ -142,6 +158,7 @@ $(document).ready(function () {
 
                 //Hide the Login Screen and Load the Game Page
                 $(".logIn").hide();
+                $("#leftHands").hide();
                 $(".main").show();
 
             });
@@ -157,6 +174,7 @@ $(document).ready(function () {
         console.log("Your Guess: " + userGuess);
         console.log("Comp Guess: " + computerGuess);
 
+
         if (userGuess === "rock" && computerGuess === "scissors") {
             $(".pickLeft").attr("src", leftRock);
             $(".pickRight").attr("src", rightScissors);
@@ -166,6 +184,10 @@ $(document).ready(function () {
                 userScore: userScore,
                 computerScore: computerScore
             });
+            database.ref(`/users/${leftPlayer}`).push({
+                playerWins: playerWins + userScore
+            })
+
         } else if (userGuess === "rock" && computerGuess === "paper") {
             $(".pickLeft").attr("src", leftRock);
             $(".pickRight").attr("src", rightPaper);
@@ -185,6 +207,9 @@ $(document).ready(function () {
                 userScore: userScore,
                 computerScore: computerScore
             });
+            database.ref(`/users/${leftPlayer}`).push({
+                playerWins: playerWins + userScore
+            })
         } else if (userGuess === "paper" && computerGuess === "scissors") {
             $(".pickLeft").attr("src", leftPaper);
             $(".pickRight").attr("src", rightScissors);
@@ -203,6 +228,9 @@ $(document).ready(function () {
                 userScore: userScore,
                 computerScore: computerScore
             });
+            database.ref(`/users/${leftPlayer}`).push({
+                playerWins: playerWins + userScore
+            })
         } else if (userGuess === "scissors" && computerGuess === "rock") {
             $(".pickLeft").attr("src", leftScissors);
             $(".pickRight").attr("src", rightRock);

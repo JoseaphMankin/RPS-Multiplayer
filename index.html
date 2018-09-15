@@ -9,8 +9,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
         crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" media="screen" href="assets/css/style.css" />
-    <script src="https://www.gstatic.com/firebasejs/5.4.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/5.4.2/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.0/firebase.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
         crossorigin="anonymous"></script>
     <script src="assets/javascript/app.js"></script>
@@ -24,30 +23,44 @@
 
     <div class="logIn">
 
-        <img class="running" src="assets/images/running.gif" alt="Running RPS">    
-        <div class="row">
-            <h3>Pick your name from these users...</h3>
-        </div>
-        <div class="row existingUsers">
-            <!-- <button class='btn btn-warning mr-2 user-btn' data-user='Joe'>
-                Joe
-            </button> -->
+        <img class="running" src="assets/images/running.gif" alt="Running RPS">
+
+        <div class="computerAsk">
+                <button class='btn btn-warning mr-2 playComputer'>
+                    Click here to play against Compy the Computer.
+                </button>
+    
+                <button class='btn btn-danger mr-2 playUser'>
+                    Click here to play against another live Player.
+                </button>
+            </div>
+
+        <div class="logInControls">
+
+            <div class="row">
+                <h3>Pick your name from these users...</h3>
+            </div>
+            <div class="row existingUsers">
+            </div>
+
+            <div class="row">
+                <h3>...or add a new name to the list!</h3>
+            </div>
+            <form class="user-form form mt-4">
+                <div class="form-group">
+                    <input class='form-control user-input' placeholder="Add Your Name Here!" type="text" />
+                </div>
+                <div class="form-group">
+                    <input class="add-user-btn btn btn-primary btn-warning" type="submit" value="add user" />
+                </div>
+            </form>
         </div>
 
-        <div class="row">
-            <h3>...or add a new name to the list!</h3>
-        </div>
-        <form class="user-form form mt-4">
-            <div class="form-group">
-                <input class='form-control user-input' placeholder="Add Your Name Here!" type="text" />
-            </div>
-            <div class="form-group">
-                <input class="add-user-btn btn btn-primary btn-warning" type="submit" value="add user" />
-            </div>
-        </form>
-
+       
 
     </div>
+
+
 
     <div class="main">
 
@@ -68,7 +81,7 @@
                     <div class="battlePick" data-type="left">
                         <img class="pickLeft" src="assets/images/leftback.png" alt="left">
                     </div>
-                    VS
+                    VS.
                     <div class="battlePick pickRight">
                         <img class="pickRight" src="assets/images/rightback.png" alt="right">
                     </div>
@@ -96,29 +109,34 @@
 
             <div class="choices col-6">
 
-                <div class="choice rockLeft" data-type="rock">
-                    <img src="assets/images/rock.png" alt="Rock">
+                <div id="leftHands">
+                    <div class="choice rockLeft" data-type="rock">
+                        <img src="assets/images/rock.png" alt="Rock">
+                    </div>
+                    <div class="choice paperLeft" data-type="paper">
+                        <img src="assets/images/paper.png" alt="Paper">
+                    </div>
+                    <div class="choice scissorsLeft" data-type="scissors">
+                        <img src="assets/images/scissors.png" alt="scissors">
+                    </div>
                 </div>
-                <div class="choice paperLeft" data-type="paper">
-                    <img src="assets/images/paper.png" alt="Paper">
+
+                <div id="rightHands">
+                    <div class="choice rockRight">
+                        <img src="assets/images/rockRight.png" alt="Rock">
+                    </div>
+                    <div class="choice paperRight">
+                        <img src="assets/images/paperRight.png" alt="Paper">
+                    </div>
+                    <div class="choice scissorsRight">
+                        <img src="assets/images/scissorsRight.png" alt="scissors">
+                    </div>
                 </div>
-                <div class="choice scissorsLeft" data-type="scissors">
-                    <img src="assets/images/scissors.png" alt="scissors">
-                </div>
-                <!-- <div class="choice rockRight">
-                <img src="assets/images/rockRight.png" alt="Rock">
-            </div>
-            <div class="choice paperRight">
-                <img src="assets/images/paperRight.png" alt="Paper">
-            </div>
-            <div class="choice scissorsRight">
-                <img src="assets/images/scissorsRight.png" alt="scissors">
-            </div> -->
 
             </div>
 
             <div class="rightStats stats col-3">
-                    <h3><span class="rightStatName">Compy</span> Stats</h3>
+                <h3><span class="rightStatName">Compy</span> Stats</h3>
                 <p class="rightWins">Wins: </p>
                 <p class="rightLosses">Losses: </p>
                 <p class="rightWinPer">Total Win %: </p>
