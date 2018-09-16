@@ -355,7 +355,7 @@ $(document).ready(function () {
                 $(".chatWindow").text("Compy says: " + getComputerInsult());
             }
         } else {
-            console.log("Add 2 player logic here")
+            console.log("Hey Joe. You wanna add 2 player logic here already!")
         }
     });
 
