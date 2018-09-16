@@ -89,92 +89,117 @@ $(document).ready(function () {
 
 
 
-
     //Chosing your player, Updating firebase & local, Starting game by unhiding Main Game Div
     $(document).on("click", ".user-btn", function (event) {
         event.preventDefault();
 
-        if (isLeftActive === false) {
-            // Get the input values
-            leftPlayer = $(this).attr("data-user");
+        let leftTest = database.ref("isLeftActive").once("value", function (snapshot) {
+            return snapshot.val()
+        }).then(leftTest => {
+
+            if (leftTest.val() === false) {
+                // Get the input values
+                leftPlayer = $(this).attr("data-user");
+
+                database.ref("/isLeftActive").set(true);
 
 
-            //MAYBE THIS NEEDS TO NOT BE A LISTENER - SAT CLASS Comparison to see if this is a New User or an Existing One
-            database.ref("/users/" + leftPlayer).once("value", function (snapshot) {
+                //MAYBE THIS NEEDS TO NOT BE A LISTENER - SAT CLASS Comparison to see if this is a New User or an Existing One
+                database.ref("/users/" + leftPlayer).once("value", function (snapshot) {
 
-                // Call your function to check if they are a first time user (aka exists).
-                // checkForFirstTime(leftPlayer);
+                    // Call your function to check if they are a first time user (aka exists).
+                    // checkForFirstTime(leftPlayer);
 
-                if (snapshot.val() !== null) {
-                    leftPlayer = snapshot.val().playerName;
-                    leftWins = parseInt(snapshot.val().playerWins);
-                    console.log("It's a Match")
-                } else {
-                    console.log("New Peeps")
-                    database.ref(`/users/${leftPlayer}`).set({
-                        playerName: leftPlayer,
-                        playerWins: 0,
-                        playerLosses: 0
-                        // }).then(user => {
-                        //     console.log(user);
-                    }).catch(error => {
-                        console.log(error)
+                    if (snapshot.val() !== null) {
+                        leftPlayer = snapshot.val().playerName;
+                        leftWins = parseInt(snapshot.val().playerWins);
+                        console.log("It's a Match")
+                    } else {
+                        console.log("New Peeps")
+                        database.ref(`/users/${leftPlayer}`).set({
+                            playerName: leftPlayer,
+                            playerWins: 0,
+                            playerLosses: 0
+                            // }).then(user => {
+                            //     console.log(user);
+                        }).catch(error => {
+                            console.log(error)
+                        })
+                    }
+
+                    database.ref("/whoIsPlaying/leftPlayer").set({
+                        leftPlayer: leftPlayer,
+                        leftWins: leftWins
                     })
-                }
 
-                //update all the labels
-                $(".left-label").text(leftPlayer);
-                $(".leftStatName").text(leftPlayer + "'s");
-                $(".battleLeft").text(leftPlayer);
-                $(".leftWins").text("Wins: " + leftWins);
+                    // //update all the labels
+                    // $(".left-label").text(leftPlayer);
+                    // $(".leftStatName").text(leftPlayer + "'s");
+                    // $(".battleLeft").text(leftPlayer);
+                    // $(".leftWins").text("Wins: " + leftWins);
 
-                //Hide the Login Screen and Load the Game Page
-                $(".logIn").hide();
-                $("#rightHands").hide();
-                $(".main").show();
+                    //Hide the Login Screen and Load the Game Page
+                    $(".logIn").hide();
+                    $("#rightHands").hide();
+                    $(".main").show();
 
-            });
-        } else {
-            // Get the input values
-            rightPlayer = $(this).attr("data-user");
+                });
+            } else {
+                // Get the input values
+                rightPlayer = $(this).attr("data-user");
 
+                database.ref("/isLeftActive").set(false);
 
-            //MAYBE THIS NEEDS TO NOT BE A LISTENER - SAT CLASS Comparison to see if this is a New User or an Existing One
-            database.ref("/users/" + rightPlayer).once("value", function (snapshot) {
+                //MAYBE THIS NEEDS TO NOT BE A LISTENER - SAT CLASS Comparison to see if this is a New User or an Existing One
+                database.ref("/users/" + rightPlayer).once("value", function (snapshot) {
 
-                // Call your function to check if they are a first time user (aka exists).
-                // checkForFirstTime(leftPlayer);
+                    // Call your function to check if they are a first time user (aka exists).
+                    // checkForFirstTime(leftPlayer);
 
-                if (snapshot.val() !== null) {
-                    rightPlayer = snapshot.val().playerName;
-                    rightWins = parseInt(snapshot.val().playerWins);
-                    console.log("It's a Match")
-                } else {
-                    console.log("New Peeps")
-                    database.ref(`/users/${rightPlayer}`).set({
-                        playerName: rightPlayer,
-                        playerWins: 0,
-                        playerLosses: 0
-                        // }).then(user => {
-                        //     console.log(user);
-                    }).catch(error => {
-                        console.log(error)
+                    if (snapshot.val() !== null) {
+                        rightPlayer = snapshot.val().playerName;
+                        rightWins = parseInt(snapshot.val().playerWins);
+                        console.log("It's a Match")
+                    } else {
+                        console.log("New Peeps")
+                        database.ref(`/users/${rightPlayer}`).set({
+                            playerName: rightPlayer,
+                            playerWins: 0,
+                            playerLosses: 0
+                            // }).then(user => {
+                            //     console.log(user);
+                        }).catch(error => {
+                            console.log(error)
+                        })
+                    }
+
+                    database.ref("/whoIsPlaying/rightPlayer").set({
+                        rightPlayer: rightPlayer,
+                        rightWins: rightWins
                     })
-                }
 
-                //update all the labels
-                $(".right-label").text(rightPlayer);
-                $(".rightStatName").text(rightPlayer + "'s");
-                $(".battleRight").text(rightPlayer);
-                $(".rightWins").text("Wins: " + rightWins);
+                    //update all the labels
+                    // $(".left-label").text(leftPlayer);
+                    // $(".leftStatName").text(leftPlayer + "'s");
+                    // $(".battleLeft").text(leftPlayer);
+                    // $(".leftWins").text("Wins: " + leftWins);
 
-                //Hide the Login Screen and Load the Game Page
-                $(".logIn").hide();
-                $("#leftHands").hide();
-                $(".main").show();
+                    // $(".right-label").text(rightPlayer);
+                    // $(".rightStatName").text(rightPlayer + "'s");
+                    // $(".battleRight").text(rightPlayer);
+                    // $(".rightWins").text("Wins: " + rightWins);
 
-            });
-        }
+                    //Hide the Login Screen and Load the Game Page
+                    $(".logIn").hide();
+                    $("#leftHands").hide();
+                    $(".main").show();
+
+                });
+
+            }
+
+
+        });
     });
 
 
@@ -282,6 +307,21 @@ $(document).ready(function () {
         $(".computerScore").text(computerScore);
         $(".leftWins").text()
         console.log(leftPlayer, rightPlayer)
+    }, function (errorObject) {
+        console.log("The read failed: " + errorObject.code)
+
+    });
+
+    database.ref("whoIsPlaying").on("value", function (snapshot) {
+        console.log(snapshot.val());
+        $(".left-label").text(snapshot.val().leftPlayer.leftPlayer);
+        $(".leftStatName").text(snapshot.val().leftPlayer.leftPlayer + "'s");
+        $(".battleLeft").text(snapshot.val().leftPlayer.leftPlayer);
+        $(".leftWins").text("Wins: " + snapshot.val().leftPlayer.leftWins);
+        $(".right-label").text(snapshot.val().rightPlayer.rightPlayer);
+        $(".rightStatName").text(snapshot.val().rightPlayer.rightPlayer + "'s");
+        $(".battleRight").text(snapshot.val().rightPlayer.rightPlayer);
+        $(".rightWins").text("Wins: " + snapshot.val().rightPlayer.rightWins);
     }, function (errorObject) {
         console.log("The read failed: " + errorObject.code)
 
