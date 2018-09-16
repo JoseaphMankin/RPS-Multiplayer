@@ -7,8 +7,8 @@ $(document).ready(function () {
         projectId: "rps-multiplayer-deab7",
         storageBucket: "rps-multiplayer-deab7.appspot.com",
         messagingSenderId: "825187295627"
-      };
-      firebase.initializeApp(config);
+    };
+    firebase.initializeApp(config);
 
     //initial global varibles   
     var database = firebase.database();
@@ -17,6 +17,7 @@ $(document).ready(function () {
 
     let leftScore = 0;
     let rightScore = 0;
+
     let userGuess = "";
     let computerGuess = "";
 
@@ -45,7 +46,7 @@ $(document).ready(function () {
     //Main Game Div screen starts out hidden during login
     $(".main").toggle();
     $(".logInControls").toggle();
-   
+
     $(".playComputer").on("click", function () {
         isplayingComputer = true;
         $(".logInControls").toggle();
@@ -86,6 +87,9 @@ $(document).ready(function () {
         `)
     });
 
+
+
+
     //Chosing your player, Updating firebase & local, Starting game by unhiding Main Game Div
     $(document).on("click", ".user-btn", function (event) {
         event.preventDefault();
@@ -94,22 +98,25 @@ $(document).ready(function () {
             // Get the input values
             leftPlayer = $(this).attr("data-user");
 
+
             //MAYBE THIS NEEDS TO NOT BE A LISTENER - SAT CLASS Comparison to see if this is a New User or an Existing One
-            database.ref().on("child_added", function (snapshot) {
+            database.ref("/users/" + leftPlayer).once("value", function (snapshot) {
 
-                let sv = snapshot.val();
+                // Call your function to check if they are a first time user (aka exists).
+                // checkForFirstTime(leftPlayer);
 
-                if (leftPlayer == snapshot.val().playerName) {
+                if (snapshot.val() !== null) {
                     leftPlayer = snapshot.val().playerName;
                     leftWins = parseInt(snapshot.val().playerWins);
                     console.log("It's a Match")
                 } else {
+                    console.log("New Peeps")
                     database.ref(`/users/${leftPlayer}`).set({
                         playerName: leftPlayer,
                         playerWins: 0,
                         playerLosses: 0
-                    }).then(user => {
-                        console.log(user);
+                        // }).then(user => {
+                        //     console.log(user);
                     }).catch(error => {
                         console.log(error)
                     })
@@ -119,7 +126,7 @@ $(document).ready(function () {
                 $(".left-label").text(leftPlayer);
                 $(".leftStatName").text(leftPlayer + "'s");
                 $(".battleLeft").text(leftPlayer);
-                $(".leftWins").text("Wins: " + leftScore);
+                $(".leftWins").text("Wins: " + leftWins);
 
                 //Hide the Login Screen and Load the Game Page
                 $(".logIn").hide();
@@ -131,20 +138,25 @@ $(document).ready(function () {
             // Get the input values
             rightPlayer = $(this).attr("data-user");
 
-            //comparison to see if this is a New User or an Existing One
-            database.ref().on("value", function (snapshot) {
 
-                if (rightPlayer == snapshot.val().playerName) {
+            //MAYBE THIS NEEDS TO NOT BE A LISTENER - SAT CLASS Comparison to see if this is a New User or an Existing One
+            database.ref("/users/" + rightPlayer).once("value", function (snapshot) {
+
+                // Call your function to check if they are a first time user (aka exists).
+                // checkForFirstTime(leftPlayer);
+
+                if (snapshot.val() !== null) {
                     rightPlayer = snapshot.val().playerName;
                     rightWins = parseInt(snapshot.val().playerWins);
                     console.log("It's a Match")
                 } else {
+                    console.log("New Peeps")
                     database.ref(`/users/${rightPlayer}`).set({
                         playerName: rightPlayer,
                         playerWins: 0,
                         playerLosses: 0
-                    }).then(user => {
-                        console.log(user);
+                        // }).then(user => {
+                        //     console.log(user);
                     }).catch(error => {
                         console.log(error)
                     })
@@ -154,7 +166,7 @@ $(document).ready(function () {
                 $(".right-label").text(rightPlayer);
                 $(".rightStatName").text(rightPlayer + "'s");
                 $(".battleRight").text(rightPlayer);
-                $(".rightWins").text("Wins: " + rightScore);
+                $(".rightWins").text("Wins: " + rightWins);
 
                 //Hide the Login Screen and Load the Game Page
                 $(".logIn").hide();
@@ -184,8 +196,8 @@ $(document).ready(function () {
                 userScore: userScore,
                 computerScore: computerScore
             });
-            database.ref(`/users/${leftPlayer}`).push({
-                playerWins: playerWins + userScore
+            database.ref("/users/" + leftPlayer).update({
+                playerWins: userScore
             })
 
         } else if (userGuess === "rock" && computerGuess === "paper") {
@@ -207,8 +219,8 @@ $(document).ready(function () {
                 userScore: userScore,
                 computerScore: computerScore
             });
-            database.ref(`/users/${leftPlayer}`).push({
-                playerWins: playerWins + userScore
+            database.ref("/users/" + leftPlayer).update({
+                playerWins: userScore
             })
         } else if (userGuess === "paper" && computerGuess === "scissors") {
             $(".pickLeft").attr("src", leftPaper);
@@ -228,8 +240,8 @@ $(document).ready(function () {
                 userScore: userScore,
                 computerScore: computerScore
             });
-            database.ref(`/users/${leftPlayer}`).push({
-                playerWins: playerWins + userScore
+            database.ref("/users/" + leftPlayer).update({
+                playerWins: userScore
             })
         } else if (userGuess === "scissors" && computerGuess === "rock") {
             $(".pickLeft").attr("src", leftScissors);
@@ -268,46 +280,21 @@ $(document).ready(function () {
     database.ref("mainScoreboard").on("value", function (snapshot) {
         $(".userScore").text(userScore);
         $(".computerScore").text(computerScore);
+        $(".leftWins").text()
         console.log(leftPlayer, rightPlayer)
-
-        // If Firebase has a player, wins and losses stored (first case)
-        //     if (snapshot.child("playerName").exists() && snapshot.child("playerWins").exists()) {
-
-        //         // Set the local variables for highBidder equal to the stored values in firebase.
-        //         playerData = snapshot.val().playerData;
-        //         playerWins = parseInt(snapshot.val().playerWins);
-        //         playerLosses = parseInt(snapshot.val().playerLosses);
-
-        //         // change the HTML to reflect the newly updated local values (most recent information from firebase)
-        //         $(".leftStatName").text(snapshot.val().playerData);
-        //         $(".leftWins").text("Wins: " + snapshot.val().playerWins);
-        //         $(".leftLosses").text("Losses: " + snapshot.val().playerLosses);
-        //         $(".leftWinPer").text(("Total Win %: " + Math.floor((playerWins / playerTotalGames) * 100)) + "%");
-        //         // Print the local data to the console.
-        //         console.log(snapshot.val().playerData);
-        //         console.log(snapshot.val().playerWins);
-        //         console.log(snapshot.val().playerLosses);
-        //     }
-
-        //     // Else Firebase doesn't have a highPrice/highBidder, so use the initial local values.
-        //     else {
-
-        //         // change the HTML to reflect the newly updated local values (most recent information from firebase)
-        //         $(".leftStatName").text(playerData);
-        //         $(".leftWins").text("Wins: " + playerWins);
-        //         $(".leftLosses").text("Losses: " + playerLosses);
-        //         // $(".leftWinPer").text(("Total Win %: " + Math.floor((playerWins / playerTotalGames * 100)) + "%");
-        //         // Print the local data to the console.
-        //         console.log(playerData);
-        //         console.log(playerWins);
-        //         console.log(playerLosses);
-        //     }
-
-        //     // If any errors are experienced, log them to console.
     }, function (errorObject) {
         console.log("The read failed: " + errorObject.code)
 
     });
+
+    // database.ref("/users/" + leftPlayer).on("value", function (snapshot) {
+    //     $(".leftWins").text(playerWins)
+
+    // }, function (errorObject) {
+    //     console.log("The read failed: " + errorObject.code)
+
+    // });
+
 
     // BOILERPLATE FOR ONLINE PRESENCE. 
     // --------------------------------------------------------------
