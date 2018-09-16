@@ -15,8 +15,10 @@ $(document).ready(function () {
     let userScore = 0;
     let computerScore = 0;
 
-    let leftScore = 0;
-    let rightScore = 0;
+    let leftComboWins = 0;
+    let rightComboWins = 0;
+    let leftComboLosses = 0;
+    let rightComboLosses = 0;
 
     let userGuess = "";
     let computerGuess = "";
@@ -24,7 +26,7 @@ $(document).ready(function () {
     let leftPlayer = "Compy";
     let rightPlayer = "Compy";
     let isLeftActive = false;
-    let isPlayingComputer = true;
+    let isPlayingComputer = false;
 
     //Firebase Variables (JOE: These might actually replace some of the above)
     // let playerData = "";
@@ -48,13 +50,20 @@ $(document).ready(function () {
     $(".logInControls").toggle();
 
     $(".playComputer").on("click", function () {
-        isplayingComputer = true;
+        isLeftActive = false;
+        isPlayingComputer = true;
+        database.ref("/isLeftActive").set(false);
+        database.ref("/whoIsPlaying/rightPlayer/").set({
+            rightPlayer: "Compy",
+            rightWins: 0,
+            rightLosses: 0
+        })
         $(".logInControls").toggle();
         $(".computerAsk").toggle();
     });
 
     $(".playUser").on("click", function () {
-        isplayingComputer = false;
+        isPlayingComputer = false;
         $(".logInControls").toggle();
         $(".computerAsk").toggle();
     });
@@ -113,6 +122,9 @@ $(document).ready(function () {
                     if (snapshot.val() !== null) {
                         leftPlayer = snapshot.val().playerName;
                         leftWins = parseInt(snapshot.val().playerWins);
+                        leftLosses = parseInt(snapshot.val().playerLosses);
+                        leftComboWins = parseInt(snapshot.val().playerWins);
+                        leftComboLosses = parseInt(snapshot.val().playerLosses);
                         console.log("It's a Match")
                     } else {
                         console.log("New Peeps")
@@ -129,14 +141,9 @@ $(document).ready(function () {
 
                     database.ref("/whoIsPlaying/leftPlayer").set({
                         leftPlayer: leftPlayer,
-                        leftWins: leftWins
+                        leftWins: leftWins,
+                        leftLosses: leftLosses
                     })
-
-                    // //update all the labels
-                    // $(".left-label").text(leftPlayer);
-                    // $(".leftStatName").text(leftPlayer + "'s");
-                    // $(".battleLeft").text(leftPlayer);
-                    // $(".leftWins").text("Wins: " + leftWins);
 
                     //Hide the Login Screen and Load the Game Page
                     $(".logIn").hide();
@@ -159,6 +166,8 @@ $(document).ready(function () {
                     if (snapshot.val() !== null) {
                         rightPlayer = snapshot.val().playerName;
                         rightWins = parseInt(snapshot.val().playerWins);
+                        rightComboWins = parseInt(snapshot.val().playerWins);
+                        rightComboLosses = parseInt(snapshot.val().playerLosses);
                         console.log("It's a Match")
                     } else {
                         console.log("New Peeps")
@@ -178,17 +187,6 @@ $(document).ready(function () {
                         rightWins: rightWins
                     })
 
-                    //update all the labels
-                    // $(".left-label").text(leftPlayer);
-                    // $(".leftStatName").text(leftPlayer + "'s");
-                    // $(".battleLeft").text(leftPlayer);
-                    // $(".leftWins").text("Wins: " + leftWins);
-
-                    // $(".right-label").text(rightPlayer);
-                    // $(".rightStatName").text(rightPlayer + "'s");
-                    // $(".battleRight").text(rightPlayer);
-                    // $(".rightWins").text("Wins: " + rightWins);
-
                     //Hide the Login Screen and Load the Game Page
                     $(".logIn").hide();
                     $("#leftHands").hide();
@@ -206,89 +204,151 @@ $(document).ready(function () {
     //Main Game Logic. If/Else could likely be DRYed up. 
 
     $(".choice").on("click", function () {
-        userGuess = $(this).attr("data-type");
-        getComputerChoice();
-        console.log("Your Guess: " + userGuess);
-        console.log("Comp Guess: " + computerGuess);
+
+        if (isPlayingComputer === true) {
+
+            userGuess = $(this).attr("data-type");
+            getComputerChoice();
+            console.log("Your Guess: " + userGuess);
+            console.log("Comp Guess: " + computerGuess);
 
 
-        if (userGuess === "rock" && computerGuess === "scissors") {
-            $(".pickLeft").attr("src", leftRock);
-            $(".pickRight").attr("src", rightScissors);
-            $(".result").text("Rock Breaks Scissors. You Win!!");
-            userScore++;
-            database.ref("mainScoreboard").set({
-                userScore: userScore,
-                computerScore: computerScore
-            });
-            database.ref("/users/" + leftPlayer).update({
-                playerWins: userScore
-            })
+            if (userGuess === "rock" && computerGuess === "scissors") {
+                $(".pickLeft").attr("src", leftRock);
+                $(".pickRight").attr("src", rightScissors);
+                $(".result").text("Rock Breaks Scissors. You Win!!");
+                userScore++;
+                leftComboWins++;
+                rightComboLosses++;
+                database.ref("mainScoreboard").set({
+                    userScore: userScore,
+                    computerScore: computerScore
+                });
+                database.ref("/users/" + leftPlayer).update({
+                    playerWins: leftComboWins
+                })
+                database.ref("/whoIsPlaying/leftPlayer/").update({
+                    leftWins: userScore
+                })
+                database.ref("/whoIsPlaying/rightPlayer/").update({
+                    rightLosses: userScore
+                })
 
-        } else if (userGuess === "rock" && computerGuess === "paper") {
-            $(".pickLeft").attr("src", leftRock);
-            $(".pickRight").attr("src", rightPaper);
-            $(".result").text("Rock is Covered By Paper. You Lose!!");
-            computerScore++;
-            database.ref("mainScoreboard").set({
-                userScore: userScore,
-                computerScore: computerScore
-            });
-            $(".computerScore").text(computerScore);
-        } else if (userGuess === "paper" && computerGuess === "rock") {
-            $(".pickLeft").attr("src", leftPaper);
-            $(".pickRight").attr("src", rightRock);
-            $(".result").text("Paper Covers Rock. You Win!!");
-            userScore++;
-            database.ref("mainScoreboard").set({
-                userScore: userScore,
-                computerScore: computerScore
-            });
-            database.ref("/users/" + leftPlayer).update({
-                playerWins: userScore
-            })
-        } else if (userGuess === "paper" && computerGuess === "scissors") {
-            $(".pickLeft").attr("src", leftPaper);
-            $(".pickRight").attr("src", rightScissors);
-            $(".result").text("Paper is Cut By Scissors. You Lose!!");
-            computerScore++;
-            database.ref("mainScoreboard").set({
-                userScore: userScore,
-                computerScore: computerScore
-            });
-        } else if (userGuess === "scissors" && computerGuess === "paper") {
-            $(".pickLeft").attr("src", leftScissors);
-            $(".pickRight").attr("src", rightPaper);
-            $(".result").text("Scissors Cuts Paper. You Win!!");
-            userScore++;
-            database.ref("mainScoreboard").set({
-                userScore: userScore,
-                computerScore: computerScore
-            });
-            database.ref("/users/" + leftPlayer).update({
-                playerWins: userScore
-            })
-        } else if (userGuess === "scissors" && computerGuess === "rock") {
-            $(".pickLeft").attr("src", leftScissors);
-            $(".pickRight").attr("src", rightRock);
-            $(".result").text("Scissors is Smashed By Rock. You Lose!!");
-            computerScore++;
-            database.ref("mainScoreboard").set({
-                userScore: userScore,
-                computerScore: computerScore
-            });
-        } else if (userGuess === "rock" && computerGuess === "rock") {
-            $(".pickLeft").attr("src", leftRock);
-            $(".pickRight").attr("src", rightRock);
-            $(".result").text("It's A Draw. Shoot Again!!");
-        } else if (userGuess === "paper" && computerGuess === "paper") {
-            $(".pickLeft").attr("src", leftPaper);
-            $(".pickRight").attr("src", rightPaper);
-            $(".result").text("It's A Draw. Shoot Again!!");
+            } else if (userGuess === "rock" && computerGuess === "paper") {
+                $(".pickLeft").attr("src", leftRock);
+                $(".pickRight").attr("src", rightPaper);
+                $(".result").text("Rock is Covered By Paper. You Lose!!");
+                computerScore++;
+                rightComboWins++;
+                leftComboLosses++;
+                database.ref("mainScoreboard").set({
+                    userScore: userScore,
+                    computerScore: computerScore
+                });
+                database.ref("/whoIsPlaying/rightPlayer/").update({
+                    rightWins: computerScore
+                })
+                database.ref("/users/" + leftPlayer).update({
+                    playerLosses: leftComboLosses
+                })
+                database.ref("/whoIsPlaying/leftPlayer/").update({
+                    leftLosses: computerScore
+                })
+            } else if (userGuess === "paper" && computerGuess === "rock") {
+                $(".pickLeft").attr("src", leftPaper);
+                $(".pickRight").attr("src", rightRock);
+                $(".result").text("Paper Covers Rock. You Win!!");
+                userScore++;
+                leftComboWins++;
+                rightComboLosses++;
+                database.ref("mainScoreboard").set({
+                    userScore: userScore,
+                    computerScore: computerScore
+                });
+                database.ref("/users/" + leftPlayer).update({
+                    playerWins: leftComboWins
+                })
+                database.ref("/whoIsPlaying/leftPlayer/").update({
+                    leftWins: userScore
+                })
+                database.ref("/whoIsPlaying/rightPlayer/").update({
+                    rightLosses: userScore
+                })
+            } else if (userGuess === "paper" && computerGuess === "scissors") {
+                $(".pickLeft").attr("src", leftPaper);
+                $(".pickRight").attr("src", rightScissors);
+                $(".result").text("Paper is Cut By Scissors. You Lose!!");
+                computerScore++;
+                rightComboWins++;
+                leftComboLosses++;
+                database.ref("mainScoreboard").set({
+                    userScore: userScore,
+                    computerScore: computerScore
+                });
+                database.ref("/whoIsPlaying/rightPlayer/").update({
+                    rightWins: computerScore
+                })
+                database.ref("/users/" + leftPlayer).update({
+                    playerLosses: leftComboLosses
+                })
+                database.ref("/whoIsPlaying/leftPlayer/").update({
+                    leftLosses: computerScore
+                })
+            } else if (userGuess === "scissors" && computerGuess === "paper") {
+                $(".pickLeft").attr("src", leftScissors);
+                $(".pickRight").attr("src", rightPaper);
+                $(".result").text("Scissors Cuts Paper. You Win!!");
+                userScore++;
+                leftComboWins++;
+                rightComboLosses++;
+                database.ref("mainScoreboard").set({
+                    userScore: userScore,
+                    computerScore: computerScore
+                });
+                database.ref("/users/" + leftPlayer).update({
+                    playerWins: leftComboWins
+                })
+                database.ref("/whoIsPlaying/leftPlayer/").update({
+                    leftWins: userScore
+                })
+                database.ref("/whoIsPlaying/rightPlayer/").update({
+                    rightLosses: userScore
+                })
+            } else if (userGuess === "scissors" && computerGuess === "rock") {
+                $(".pickLeft").attr("src", leftScissors);
+                $(".pickRight").attr("src", rightRock);
+                $(".result").text("Scissors is Smashed By Rock. You Lose!!");
+                computerScore++;
+                rightComboWins++;
+                leftComboLosses++;
+                database.ref("mainScoreboard").set({
+                    userScore: userScore,
+                    computerScore: computerScore
+                });
+                database.ref("/whoIsPlaying/rightPlayer/").update({
+                    rightWins: computerScore
+                })
+                database.ref("/users/" + leftPlayer).update({
+                    playerLosses: leftComboLosses
+                })
+                database.ref("/whoIsPlaying/leftPlayer/").update({
+                    leftLosses: computerScore
+                })
+            } else if (userGuess === "rock" && computerGuess === "rock") {
+                $(".pickLeft").attr("src", leftRock);
+                $(".pickRight").attr("src", rightRock);
+                $(".result").text("It's A Draw. Shoot Again!!");
+            } else if (userGuess === "paper" && computerGuess === "paper") {
+                $(".pickLeft").attr("src", leftPaper);
+                $(".pickRight").attr("src", rightPaper);
+                $(".result").text("It's A Draw. Shoot Again!!");
+            } else {
+                $(".pickLeft").attr("src", leftScissors);
+                $(".pickRight").attr("src", rightScissors);
+                $(".result").text("It's A Draw. Shoot Again!!");
+            }
         } else {
-            $(".pickLeft").attr("src", leftScissors);
-            $(".pickRight").attr("src", rightScissors);
-            $(".result").text("It's A Draw. Shoot Again!!");
+            console.log("add some user logic")
         }
     });
 
@@ -317,23 +377,20 @@ $(document).ready(function () {
         $(".left-label").text(snapshot.val().leftPlayer.leftPlayer);
         $(".leftStatName").text(snapshot.val().leftPlayer.leftPlayer + "'s");
         $(".battleLeft").text(snapshot.val().leftPlayer.leftPlayer);
-        $(".leftWins").text("Wins: " + snapshot.val().leftPlayer.leftWins);
+        $(".leftWins").text("Wins: " + leftComboWins);
+        $(".leftLosses").text("Losses: " + leftComboLosses);
+        $(".leftWinPer").text("Win Ratio: " + Math.floor(leftComboWins/(leftComboWins + leftComboLosses) * 100) + "%")
         $(".right-label").text(snapshot.val().rightPlayer.rightPlayer);
         $(".rightStatName").text(snapshot.val().rightPlayer.rightPlayer + "'s");
         $(".battleRight").text(snapshot.val().rightPlayer.rightPlayer);
-        $(".rightWins").text("Wins: " + snapshot.val().rightPlayer.rightWins);
+        $(".rightWins").text("Wins: " + rightComboWins);
+        $(".rightLosses").text("Losses: " + rightComboLosses);
+        $(".rightWinPer").text("Win Ratio: " + Math.floor(rightComboWins/(rightComboWins + rightComboLosses) * 100) + "%")
     }, function (errorObject) {
         console.log("The read failed: " + errorObject.code)
 
     });
 
-    // database.ref("/users/" + leftPlayer).on("value", function (snapshot) {
-    //     $(".leftWins").text(playerWins)
-
-    // }, function (errorObject) {
-    //     console.log("The read failed: " + errorObject.code)
-
-    // });
 
 
     // BOILERPLATE FOR ONLINE PRESENCE. 

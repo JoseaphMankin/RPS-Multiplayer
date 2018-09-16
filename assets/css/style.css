@@ -156,6 +156,15 @@ h3{
     width: 100%;
     padding: 0px;
 }
+
+.battleBtns{
+    position: relative;
+    text-align: center;
+    margin: 0px auto;
+    width: 100%;
+    padding: 0px;
+}
+
 .battleUserRight{
     position: relative;
     text-align: left;
