@@ -1,5 +1,6 @@
 $(document).ready(function () {
 
+    //Firebase Key Initializer
     var config = {
         apiKey: "AIzaSyAmtWU0JuUHWYTWR1MeE2eb0X6zn5vuOvs",
         authDomain: "rps-multiplayer-deab7.firebaseapp.com",
@@ -10,7 +11,7 @@ $(document).ready(function () {
     };
     firebase.initializeApp(config);
 
-    //initial global varibles   
+    //Initial global varibles   
     var database = firebase.database();
     let userScore = 0;
     let computerScore = 0;
@@ -41,7 +42,10 @@ $(document).ready(function () {
     //Main Game Div screen starts out hidden during login
     $(".main").toggle();
     $(".logInControls").toggle();
+    $(".chat").toggle();
 
+
+    //Screen 1 is the switch between playing Compy or Playing someone else
     $(".playComputer").on("click", function () {
         isLeftActive = false;
         isPlayingComputer = true;
@@ -61,11 +65,10 @@ $(document).ready(function () {
         $(".computerAsk").toggle();
     });
 
-    //LOGIN SCREEN----------------------------------------------------
+    //USER LOGIN SCREEN----------------------------------------------------
     //Dynamic Creation of User Buttons if they already exist in the "users" Firebase
 
-    database.ref("users").on("value", function (snapshot) {
-        console.log(snapshot.val());
+    database.ref("users").once("value", function (snapshot) {
 
         snapshot.forEach((child) => {
             console.log(child.val().playerName);
@@ -81,6 +84,7 @@ $(document).ready(function () {
     //Dynamic Creation of a a new User button: 
     $(".add-user-btn").on("click", function (event) {
         event.preventDefault();
+
         let user = $(".user-input").val().trim();
         $(".existingUsers").append(`
         <button class='btn btn-success mr-2 user-btn' data-user='${user}'>
@@ -95,6 +99,7 @@ $(document).ready(function () {
     $(document).on("click", ".user-btn", function (event) {
         event.preventDefault();
 
+
         let leftTest = database.ref("isLeftActive").once("value", function (snapshot) {
             return snapshot.val()
         }).then(leftTest => {
@@ -105,8 +110,6 @@ $(document).ready(function () {
 
                 database.ref("/isLeftActive").set(true);
 
-
-                //MAYBE THIS NEEDS TO NOT BE A LISTENER - SAT CLASS Comparison to see if this is a New User or an Existing One
                 database.ref("/users/" + leftPlayer).once("value", function (snapshot) {
 
                     // Call your function to check if they are a first time user (aka exists).
@@ -125,11 +128,17 @@ $(document).ready(function () {
                             playerName: leftPlayer,
                             playerWins: 0,
                             playerLosses: 0
-                            // }).then(user => {
-                            //     console.log(user);
                         }).catch(error => {
                             console.log(error)
                         })
+
+                        database.ref("/users/" + leftPlayer).once("value", function (snapshot) {
+                            leftPlayer = snapshot.val().playerName;
+                            leftWins = parseInt(snapshot.val().playerWins);
+                            leftLosses = parseInt(snapshot.val().playerLosses);
+                            leftComboWins = parseInt(snapshot.val().playerWins);
+                            leftComboLosses = parseInt(snapshot.val().playerLosses);
+                        });
                     }
 
                     database.ref("/whoIsPlaying/leftPlayer").set({
@@ -142,6 +151,7 @@ $(document).ready(function () {
                     $(".logIn").hide();
                     $("#rightHands").hide();
                     $(".main").show();
+                    $(".chat").show();
 
                 });
             } else {
@@ -184,6 +194,7 @@ $(document).ready(function () {
                     $(".logIn").hide();
                     $("#leftHands").hide();
                     $(".main").show();
+                    $(".chat").show();
 
                 });
 
@@ -194,7 +205,7 @@ $(document).ready(function () {
     });
 
 
-    //Main Game Logic. If/Else could likely be DRYed up. 
+    //MAIN GAME LOGIC STARTS HERE----------------------------
 
     $(".choice").on("click", function () {
 
@@ -344,7 +355,7 @@ $(document).ready(function () {
                 $(".chatWindow").text("Compy says: " + getComputerInsult());
             }
         } else {
-            console.log("add some user logic")
+            console.log("Add 2 player logic here")
         }
     });
 
@@ -357,7 +368,7 @@ $(document).ready(function () {
     }
 
 
-    //Firebase listener for updating and DOM updating. 
+    //Firebase listeners for Database Varibles and DOM updating. 
     database.ref("mainScoreboard").on("value", function (snapshot) {
         $(".userScore").text(userScore);
         $(".computerScore").text(computerScore);
@@ -387,13 +398,13 @@ $(document).ready(function () {
 
     });
 
-    // CHAT FUNCTIONS
+    // CHAT FUNCTIONS --------------------------------------
     $(document).on("click", "#add-chat", function (event) {
         event.preventDefault();
 
         // Grabbed values from text-boxes
         message = $("#chat-input").val().trim();
-   
+
         // Code for "Setting values in the database"
         database.ref("/chat").update({
             message: leftPlayer + " says: " + message
@@ -415,9 +426,7 @@ $(document).ready(function () {
         return computerInsult;
     }
 
-
-
-    // BOILERPLATE FOR ONLINE PRESENCE. 
+    // BOILERPLATE FOR ONLINE PRESENCE (Didn't really use this). 
     // --------------------------------------------------------------
     // connectionsRef references a specific location in our database.
     // All of our connections will be stored in this directory.
