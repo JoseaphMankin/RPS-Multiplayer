@@ -28,13 +28,6 @@ $(document).ready(function () {
     let isLeftActive = false;
     let isPlayingComputer = false;
 
-    //Firebase Variables (JOE: These might actually replace some of the above)
-    // let playerData = "";
-    // let playerName = "";
-    // let playerWins = 0;
-    // let playerLosses = 0;
-    // let playerTotalGames = 0;
-    // let playerWinPer = Math.floor((playerWins / playerTotalGames) * 100);
 
     //CONSTs for all the hand images
     const leftRock = "assets/images/rock.png";
@@ -338,14 +331,17 @@ $(document).ready(function () {
                 $(".pickLeft").attr("src", leftRock);
                 $(".pickRight").attr("src", rightRock);
                 $(".result").text("It's A Draw. Shoot Again!!");
+                $(".chatWindow").text("Compy says: " + getComputerInsult());
             } else if (userGuess === "paper" && computerGuess === "paper") {
                 $(".pickLeft").attr("src", leftPaper);
                 $(".pickRight").attr("src", rightPaper);
                 $(".result").text("It's A Draw. Shoot Again!!");
+                $(".chatWindow").text("Compy says: " + getComputerInsult());
             } else {
                 $(".pickLeft").attr("src", leftScissors);
                 $(".pickRight").attr("src", rightScissors);
                 $(".result").text("It's A Draw. Shoot Again!!");
+                $(".chatWindow").text("Compy says: " + getComputerInsult());
             }
         } else {
             console.log("add some user logic")
@@ -379,17 +375,45 @@ $(document).ready(function () {
         $(".battleLeft").text(snapshot.val().leftPlayer.leftPlayer);
         $(".leftWins").text("Wins: " + leftComboWins);
         $(".leftLosses").text("Losses: " + leftComboLosses);
-        $(".leftWinPer").text("Win Ratio: " + Math.floor(leftComboWins/(leftComboWins + leftComboLosses) * 100) + "%")
+        $(".leftWinPer").text("Win Ratio: " + Math.floor(leftComboWins / (leftComboWins + leftComboLosses) * 100) + "%")
         $(".right-label").text(snapshot.val().rightPlayer.rightPlayer);
         $(".rightStatName").text(snapshot.val().rightPlayer.rightPlayer + "'s");
         $(".battleRight").text(snapshot.val().rightPlayer.rightPlayer);
         $(".rightWins").text("Wins: " + rightComboWins);
         $(".rightLosses").text("Losses: " + rightComboLosses);
-        $(".rightWinPer").text("Win Ratio: " + Math.floor(rightComboWins/(rightComboWins + rightComboLosses) * 100) + "%")
+        $(".rightWinPer").text("Win Ratio: " + Math.floor(rightComboWins / (rightComboWins + rightComboLosses) * 100) + "%")
     }, function (errorObject) {
         console.log("The read failed: " + errorObject.code)
 
     });
+
+    // CHAT FUNCTIONS
+    $(document).on("click", "#add-chat", function (event) {
+        event.preventDefault();
+
+        // Grabbed values from text-boxes
+        message = $("#chat-input").val().trim();
+   
+        // Code for "Setting values in the database"
+        database.ref("/chat").update({
+            message: leftPlayer + " says: " + message
+        });
+    });
+
+    database.ref("chat").on("value", function (snapshot) {
+        $(".chatWindow").text(snapshot.val().message)
+    }, function (errorObject) {
+        console.log("The read failed: " + errorObject.code)
+
+    });
+
+    //Array Shuffler for getting a computer insult
+    function getComputerInsult() {
+        let compyChat = ["I'm the best and that's all you need to know", "You Ain't Nuthin", "Why are you so terrible?", "I do believe I'm better at this than you", "You Just Stinky"]
+        let randomNumber = Math.floor(Math.random() * 5);
+        computerInsult = compyChat[randomNumber];
+        return computerInsult;
+    }
 
 
 
