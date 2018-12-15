@@ -41,29 +41,29 @@ $(document).ready(function () {
 
     //Main Game Div screen starts out hidden during login
     $(".main").toggle();
-    $(".logInControls").toggle();
+    // $(".logInControls").toggle();
     $(".chat").toggle();
 
 
     //Screen 1 is the switch between playing Compy or Playing someone else
-    $(".playComputer").on("click", function () {
-        isLeftActive = false;
-        isPlayingComputer = true;
-        database.ref("/isLeftActive").set(false);
-        database.ref("/whoIsPlaying/rightPlayer/").set({
-            rightPlayer: "Compy",
-            rightWins: 0,
-            rightLosses: 0
-        })
-        $(".logInControls").toggle();
-        $(".computerAsk").toggle();
-    });
+    // $(".playComputer").on("click", function () {
+    //     isLeftActive = false;
+    //     isPlayingComputer = true;
+    //     database.ref("/isLeftActive").set(false);
+    //     database.ref("/whoIsPlaying/rightPlayer/").set({
+    //         rightPlayer: "Compy",
+    //         rightWins: 0,
+    //         rightLosses: 0
+    //     })
+    //     $(".logInControls").toggle();
+    //     $(".computerAsk").toggle();
+    // });
 
-    $(".playUser").on("click", function () {
-        isPlayingComputer = false;
-        $(".logInControls").toggle();
-        $(".computerAsk").toggle();
-    });
+    // $(".playUser").on("click", function () {
+    //     isPlayingComputer = false;
+    //     $(".logInControls").toggle();
+    //     $(".computerAsk").toggle();
+    // });
 
     //USER LOGIN SCREEN----------------------------------------------------
     //Dynamic Creation of User Buttons if they already exist in the "users" Firebase
@@ -355,7 +355,9 @@ $(document).ready(function () {
                 $(".chatWindow").text("Compy says: " + getComputerInsult());
             }
         } else {
-            console.log("Hey Joe. You wanna add 2 player logic here already!")
+
+            if ($(`".${this}`).attr("data-type") === "rockRight")
+            console.log("Right Picks Rock!")
         }
     });
 
